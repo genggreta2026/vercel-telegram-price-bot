@@ -1,0 +1,11 @@
+**仓库首页中间 → 点击 "creating a new file" 蓝色链接**
+
+**文件名**：`vercel.json` ← **根目录**
+
+**内容**（完整复制粘贴）：
+
+{
+  "version": 2,
+  "builds": [{"src": "api/main.py", "use": "@vercel/python"}],
+  "routes": [{"src": "/(.*)", "dest": "api/main.py"}]
+}
