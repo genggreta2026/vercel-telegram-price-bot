@@ -1,5 +1,4 @@
-**仓库 → api/index.js → 全部替换**：
-```js
+
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
