@@ -1,6 +1,5 @@
 
-**仓库 → package.json → 编辑 → 全部替换**：
-```json
+
 {
   "name": "vercel-telegram-price-bot",
   "version": "1.0.0",
