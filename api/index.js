@@ -24,6 +24,31 @@ app.post('/', (req, res) => {
     res.sendStatus(200);
 });
 
+// Bot功能
 bot.onText(/\/start/, async (msg) => {
     await bot.sendMessage(msg.chat.id, 
-        "🚀 行情
+        "🚀 行情 Bot 已启动！\n📊 /price BTC - 查询比特币价格\n📊 /price ETH - 查询以太坊价格"
+    );
+});
+
+bot.onText(/\/price (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    const symbol = match[1].toUpperCase();
+    
+    try {
+        await bot.sendMessage(chatId, `⏳ 查询 ${symbol} 价格...`);
+        const res = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`);
+        const price = parseFloat(res.data.price);
+        await bot.sendMessage(chatId, 
+            `💰 ${symbol}/USDT: **$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}**\n\n` +
+            `[📈 Trade Now（立即交易）](https://kai.com/register?inviteCode=G6D7B9)\n` +
+            `[😇 Ecological Partner（成为合伙人）](https://kai.com/kai-ambassador.html)\n` +
+            `[👸 C2C Merchant（成为C2C商家）](https://kai.com/register?inviteCode=G6D7B9)\n`,
+            { parse_mode: 'Markdown' }
+        );
+    } catch (error) {
+        await bot.sendMessage(chatId, "❌ 查询失败，请稍后重试");
+    }
+});
+
+module.exports = app;
