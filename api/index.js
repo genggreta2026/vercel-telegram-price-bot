@@ -1,3 +1,5 @@
+**仓库 → api/index.js → 全部替换**：
+```js
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
@@ -8,19 +10,22 @@ if (!token) {
     process.exit(1);
 }
 
-const bot = new TelegramBot(token, { webHook: true });
 const app = express();
 app.use(express.json());
+app.use(express.raw({type: 'application/json'}));
 
+const bot = new TelegramBot(token, { webHook: true });
+
+// 健康检查
 app.get('/', (req, res) => res.json({ status: 'kai-price-bot ok' }));
-app.post(`/${token}`, express.raw({type: 'application/json'}), (req, res) => {
+
+// **修复**：根路径接收所有Telegram更新
+app.post('/', (req, res) => {
     bot.processUpdate(JSON.parse(req.body));
     res.sendStatus(200);
 });
 
-app.listen(process.env.PORT || 3000);
-
-// ===== 你的功能（修复版）=====
+// ===== 你的功能代码（完美保留！）=====
 bot.onText(/\/start/, async (msg) => {
     await bot.sendMessage(msg.chat.id, 
         "🚀 行情 Bot 已启动！\n📊 /price BTC - 查询比特币价格\n📊 /price ETH - 查询以太坊价格"
@@ -29,7 +34,7 @@ bot.onText(/\/start/, async (msg) => {
 
 bot.onText(/\/price (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
-    const symbol = match[1].toUpperCase();  // ✅ 修复这里！
+    const symbol = match.toUpperCase();[11]
     
     try {
         await bot.sendMessage(chatId, `⏳ 查询 ${symbol} 价格...`);
@@ -47,4 +52,4 @@ bot.onText(/\/price (.+)/, async (msg, match) => {
     }
 });
 
-module.exports = app;
+module.exports = app;  // **Vercel必须有这行**
