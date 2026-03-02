@@ -4,6 +4,11 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 const token = process.env.BOT_TOKEN;
+if (!token) {
+    console.error('❌ 请设置 BOT_TOKEN');
+    process.exit(1);
+}
+
 const bot = new TelegramBot(token, { webHook: true });
 const app = express();
 app.use(express.json());
@@ -16,10 +21,17 @@ app.post(`/${token}`, express.raw({type: 'application/json'}), (req, res) => {
 
 app.listen(process.env.PORT || 3000);
 
-// 你的推广Bot功能
+// ===== 你的功能（修复版）=====
+bot.onText(/\/start/, async (msg) => {
+    await bot.sendMessage(msg.chat.id, 
+        "🚀 行情 Bot 已启动！\n📊 /price BTC - 查询比特币价格\n📊 /price ETH - 查询以太坊价格"
+    );
+});
+
 bot.onText(/\/price (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
-    const symbol = match.toUpperCase();
+    const symbol = match[1].toUpperCase();  // ✅ 修复这里！
+    
     try {
         await bot.sendMessage(chatId, `⏳ 查询 ${symbol} 价格...`);
         const res = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`);
